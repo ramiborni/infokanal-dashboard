@@ -412,13 +412,13 @@ const Dashboard = ({ config }: IDashboardProps) => {
                 <br />
                 <div>
                   <Typography variant="subtitle1">RSS Haugaland:</Typography>
-                  <a href="https://www.infokanal.com/haugaland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/haugaland_rss.xml</a>
+                  <a href="https://www.infokanal.com/admin/haugaland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_rss.xml</a>
                 </div>
                 <div>
                   <Typography variant="subtitle1">
                     RSS Sunnhordland:
                   </Typography>
-                  <a href="https://www.infokanal.com/sunnhordland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/sunnhordland_rss.xml</a>
+                  <a href="https://www.infokanal.com/admin/sunnhordland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland_rss.xml</a>
                 </div>
                 <div>
                   <Typography variant="subtitle1">
