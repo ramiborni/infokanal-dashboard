@@ -27,8 +27,9 @@ import {
 } from "@mui/material";
 import { ReactNode, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Image } from "@mui/icons-material";
 import axios from "axios";
+import PictureList from "./PictureList";
 
 interface IDashboardProps {
   config: {
@@ -36,6 +37,7 @@ interface IDashboardProps {
       username: string;
       prefix: string;
       suffix: string;
+      images: string[];
     }[];
     within_time: string;
     show_items: number;
@@ -55,6 +57,8 @@ const Dashboard = ({ config }: IDashboardProps) => {
   const [twitterAccounts, setTwitterAccounts] = useState(config.twitter_accounts);
   const [openNewTwitterAccDialog, setOpenNewTwitterAccDialog] = useState(false);
   const [openDeleteTwitterAccDialog, setOpenDeleteNewTwitterAccDialog] =
+    useState(false);
+  const [openPicsTwitterAccDialog, setOpenPicsNewTwitterAccDialog] =
     useState(false);
   const [openEditTwitterAccDialog, setOpenEditNewTwitterAccDialog] =
     useState(false);
@@ -82,6 +86,11 @@ const Dashboard = ({ config }: IDashboardProps) => {
     handleOpenDeleteTwitterAccDialog();
   };
 
+  const openPicsTwitterAccount = (username: string) => {
+    selectTwitterAccount(username);
+    handleOpenPicsTwitterAccDialog();
+  }
+
   const selectTwitterAccount = (username: string) => {
     setSelectedTwitterAccount(username);
   };
@@ -95,6 +104,10 @@ const Dashboard = ({ config }: IDashboardProps) => {
     setOpenNewTwitterAccDialog(true);
   };
 
+  const handleClosePicsTwitterAccDialog = () => {
+    setOpenPicsNewTwitterAccDialog(false);
+  }
+
   const handleCloseNewAccDialog = () => {
     setOpenNewTwitterAccDialog(false);
   };
@@ -106,6 +119,10 @@ const Dashboard = ({ config }: IDashboardProps) => {
   const handleOpenDeleteTwitterAccDialog = () => {
     setOpenDeleteNewTwitterAccDialog(true);
   };
+
+  const handleOpenPicsTwitterAccDialog = () => {
+    setOpenPicsNewTwitterAccDialog(true);
+  }
 
   const handleCloseEditTwitterAccDialog = () => {
     setOpenEditNewTwitterAccDialog(false);
@@ -158,6 +175,14 @@ const Dashboard = ({ config }: IDashboardProps) => {
     });
   };
 
+  const addPicture = () => {
+
+  }
+
+  const deletePicture = () => {
+
+  }
+
   const saveData = async () => {
     if (withinTime == '' && showItems == 0) {
       alert("At least one of 'Scrapper Within Time' or 'Number of News Displayed' should be declared and set with a value. Please specify either 'Within Time' or 'Number of News Displayed' in the configuration settings.")
@@ -195,163 +220,230 @@ const Dashboard = ({ config }: IDashboardProps) => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Container component="main" maxWidth="md" sx={{ mb: 4 }}>
-        <Paper
-          variant="outlined"
-          sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
-        >
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <Typography variant="h4">RSS Scrapper Settings</Typography>
-            <br />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="time"
-              label="Scrapper Within Time"
-              name="time"
-              autoComplete="time"
-              placeholder="10h"
-              value={withinTime}
-              onChange={(e) => setWithinTime(e.target.value)}
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              type="number"
-              id="showitems"
-              label="Number of news displayed"
-              helperText="Setting this field to 0 will disable it in the scraper. If you set a different number, it will establish a priority for this field, causing the scraper to disregard the 'Within Time' parameter."
-              name="time"
-              autoComplete="time"
-              placeholder="10h"
-              value={showItems}
-              onChange={(e) => setShowItems(Number(e.target.value))}
-              autoFocus
-            />
-            <br />
-
-            <Autocomplete
-              style={{ paddingTop: "10px" }}
-              multiple
-              id="keywords1"
-              freeSolo
-              fullWidth
-              placeholder="1"
-
-              value={selectedKeywords1}
-              onChange={(event, newValue) => {
-                setKeywords1([...newValue]);
-              }}
-              options={alreadySavedKeywords1}
-              getOptionLabel={(option) => option}
-              renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => (
-                  <Chip label={option} {...getTagProps({ index })} />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  required
-                  {...params}
-                  label="Haugaland Keywords"
-                  placeholder="Haugaland keyword"
-                />
-              )}
-            />
-            <br />
-            <Autocomplete
-              multiple
-              id="keywords2"
-              freeSolo
-              fullWidth
-              value={selectedKeywords2}
-              onChange={(event, newValue) => {
-                setKeywords2([...newValue]);
-              }}
-              options={alreadySavedKeywords2}
-              getOptionLabel={(option) => option}
-              renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => (
-                  <Chip label={option} {...getTagProps({ index })} />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  required
-                  {...params}
-                  label="Sunnhordland Keywords"
-                  placeholder="Sunnhordland keyword"
-                />
-              )}
-            />
-            <br />
-            <Divider />
-            <br />
-            <Typography variant="h5"> Twitter Accounts</Typography>
-            <Grid container justifyContent="flex-end">
-              <Button onClick={handleClickOpenNewAccDialog}>
-                <AddIcon />
-                Add Twitter Account
-              </Button>
-            </Grid>
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Username</TableCell>
-                    <TableCell align="left">Prefix</TableCell>
-                    <TableCell align="left">Suffix</TableCell>
-                    <TableCell align="center">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {twitterAccounts.map((row) => (
-                    <TableRow
-                      key={row.username}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {row.username}
-                      </TableCell>
-                      <TableCell align="left">{row.prefix}</TableCell>
-                      <TableCell align="left">{row.suffix}</TableCell>
-                      <TableCell align="right">
-                        <IconButton
-                          onClick={() => openEditTwitterAccount(row.username)}
-                        >
-                          <Edit />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => openDeleteTwitterAccount(row.username)}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <Divider />
-
-            <Button
-              onClick={saveData}
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+      <Container component="main" maxWidth="xl" sx={{ mb: 4 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} lg={8}>
+            <Paper
+              variant="outlined"
+              sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
             >
-              SAVE
-            </Button>
-          </Box>
-        </Paper>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                noValidate
+                sx={{ mt: 1 }}
+              >
+                <Typography variant="h4">RSS Scrapper Settings</Typography>
+                <br />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="time"
+                  label="Scrapper Within Time"
+                  name="time"
+                  autoComplete="time"
+                  placeholder="10h"
+                  value={withinTime}
+                  onChange={(e) => setWithinTime(e.target.value)}
+                  autoFocus
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  type="number"
+                  id="showitems"
+                  label="Number of news displayed"
+                  helperText="Setting this field to 0 will disable it in the scraper. If you set a different number, it will establish a priority for this field, causing the scraper to disregard the 'Within Time' parameter."
+                  name="time"
+                  autoComplete="time"
+                  placeholder="10h"
+                  value={showItems}
+                  onChange={(e) => setShowItems(Number(e.target.value))}
+                  autoFocus
+                />
+                <br />
+
+                <Autocomplete
+                  style={{ paddingTop: "10px" }}
+                  multiple
+                  id="keywords1"
+                  freeSolo
+                  fullWidth
+                  placeholder="1"
+
+                  value={selectedKeywords1}
+                  onChange={(event, newValue) => {
+                    setKeywords1([...newValue]);
+                  }}
+                  options={alreadySavedKeywords1}
+                  getOptionLabel={(option) => option}
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip label={option} {...getTagProps({ index })} />
+                    ))
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      required
+                      {...params}
+                      label="Haugaland Keywords"
+                      placeholder="Haugaland keyword"
+                    />
+                  )}
+                />
+                <br />
+                <Autocomplete
+                  multiple
+                  id="keywords2"
+                  freeSolo
+                  fullWidth
+                  value={selectedKeywords2}
+                  onChange={(event, newValue) => {
+                    setKeywords2([...newValue]);
+                  }}
+                  options={alreadySavedKeywords2}
+                  getOptionLabel={(option) => option}
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip label={option} {...getTagProps({ index })} />
+                    ))
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      required
+                      {...params}
+                      label="Sunnhordland Keywords"
+                      placeholder="Sunnhordland keyword"
+                    />
+                  )}
+                />
+                <br />
+                <Divider />
+                <br />
+                <Typography variant="h5"> Twitter Accounts</Typography>
+                <Grid container justifyContent="flex-end">
+                  <Button onClick={handleClickOpenNewAccDialog}>
+                    <AddIcon />
+                    Add Twitter Account
+                  </Button>
+                </Grid>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Username</TableCell>
+                        <TableCell align="left">Prefix</TableCell>
+                        <TableCell align="left">Suffix</TableCell>
+                        <TableCell align="center">Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {twitterAccounts.map((row) => (
+                        <TableRow
+                          key={row.username}
+                          sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {row.username}
+                          </TableCell>
+                          <TableCell align="left">{row.prefix}</TableCell>
+                          <TableCell align="left">{row.suffix}</TableCell>
+                          <TableCell align="right">
+                            <IconButton
+                              onClick={() => openEditTwitterAccount(row.username)}
+                            >
+                              <Edit />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => openPicsTwitterAccount(row.username)}
+                            >
+                              <Image />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => openDeleteTwitterAccount(row.username)}
+                            >
+                              <Delete />
+                            </IconButton>
+
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Divider />
+
+                <Button
+                  onClick={saveData}
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  SAVE
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} lg={4} style={{ textOverflow: 'ellipsis' }}>
+            <Paper
+              variant="outlined"
+              sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
+            >
+              <Box
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: '100%',
+                  display: 'inline-block'
+                }}
+              >
+                <Typography variant="h4">Link</Typography>
+                <br />
+                <div>
+                  <Typography variant="subtitle1">RSS Haugaland:</Typography>
+                  <a href="https://www.infokanal.com/haugaland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/haugaland_rss.xml</a>
+                </div>
+                <div>
+                  <Typography variant="subtitle1">
+                    RSS Sunnhordland: 
+                  </Typography>
+                  <a href="https://www.infokanal.com/sunnhordland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/sunnhordland_rss.xml</a>
+                </div>
+                <div>
+                  <Typography variant="subtitle1">
+                    Vertical integrations Haugaland: </Typography>
+                    <a href="https://www.infokanal.com/admin/haugaland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland.html</a>
+                  
+                </div>
+                <div>
+                  <Typography variant="subtitle1">
+                    Vertical integrations Sunnhordland: </Typography>
+                    <a href="https://www.infokanal.com/admin/sunnhordland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland.html</a>
+                  
+                </div>
+                <div>
+                  <Typography variant="subtitle1">
+                    Horizontal integration Haugaland: </Typography>
+                    <a href="https://www.infokanal.com/admin/haugaland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_horizontal.html</a>
+                  
+                </div>
+
+                <div>
+                  <Typography variant="subtitle1">
+                    Horizontal integration Sunnhordland:
+                  </Typography>
+                  <a href="https://www.infokanal.com/admin/sunnhordland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland_horizontal.html</a>
+                </div>
+
+
+
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+
       </Container>
       <Dialog open={openNewTwitterAccDialog} onClose={handleCloseNewAccDialog}>
         <DialogTitle>Add New Twitter Account</DialogTitle>
@@ -503,6 +595,18 @@ const Dashboard = ({ config }: IDashboardProps) => {
           <Button onClick={deleteTwitterAccount} autoFocus>
             Delete
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openPicsTwitterAccDialog}
+        onClose={handleClosePicsTwitterAccDialog}
+      >
+        <DialogTitle>Edit Images for Twitter Account pics</DialogTitle>
+        <DialogContent>
+          <PictureList pictures={[]} deletePicture={deletePicture} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePicsTwitterAccDialog}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
