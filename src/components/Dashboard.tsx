@@ -62,10 +62,16 @@ const Dashboard = ({ config }: IDashboardProps) => {
     useState(false);
   const [openEditTwitterAccDialog, setOpenEditNewTwitterAccDialog] =
     useState(false);
-  const [newAccData, setNewAccData] = useState({
+  const [newAccData, setNewAccData] = useState<{
+    username: string
+    prefix: string
+    suffix: string
+    images: string[]
+  }>({
     username: "",
     prefix: "",
     suffix: "",
+    images: []
   });
   const [selectedTwitterAccount, setSelectedTwitterAccount] =
     useState<string>();
@@ -77,6 +83,7 @@ const Dashboard = ({ config }: IDashboardProps) => {
       username: username,
       prefix: acc.prefix,
       suffix: acc.suffix,
+      images: acc.images
     });
     handleOpenEditTwitterAccDialog();
   };
@@ -145,6 +152,7 @@ const Dashboard = ({ config }: IDashboardProps) => {
         username: "",
         prefix: "",
         suffix: "",
+        images: []
       });
       handleCloseNewAccDialog();
     }
@@ -172,6 +180,7 @@ const Dashboard = ({ config }: IDashboardProps) => {
       username: "",
       suffix: "",
       prefix: "",
+      images: [],
     });
   };
 
@@ -407,27 +416,27 @@ const Dashboard = ({ config }: IDashboardProps) => {
                 </div>
                 <div>
                   <Typography variant="subtitle1">
-                    RSS Sunnhordland: 
+                    RSS Sunnhordland:
                   </Typography>
                   <a href="https://www.infokanal.com/sunnhordland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/sunnhordland_rss.xml</a>
                 </div>
                 <div>
                   <Typography variant="subtitle1">
                     Vertical integrations Haugaland: </Typography>
-                    <a href="https://www.infokanal.com/admin/haugaland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland.html</a>
-                  
+                  <a href="https://www.infokanal.com/admin/haugaland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland.html</a>
+
                 </div>
                 <div>
                   <Typography variant="subtitle1">
                     Vertical integrations Sunnhordland: </Typography>
-                    <a href="https://www.infokanal.com/admin/sunnhordland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland.html</a>
-                  
+                  <a href="https://www.infokanal.com/admin/sunnhordland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland.html</a>
+
                 </div>
                 <div>
                   <Typography variant="subtitle1">
                     Horizontal integration Haugaland: </Typography>
-                    <a href="https://www.infokanal.com/admin/haugaland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_horizontal.html</a>
-                  
+                  <a href="https://www.infokanal.com/admin/haugaland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_horizontal.html</a>
+
                 </div>
 
                 <div>
