@@ -1,9 +1,11 @@
 import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Link } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import { ICategory } from "../interfaces/category.interface";
 import AddCategoryDialog from "./AddCategoryDialog";
 import { useState } from "react";
+import ShowLinksDialog from "./ShowLinksDialog";
+import EditCategoryDialog from "./EditCategoryDialog";
 
 interface IPropCategoryList {
     categories: ICategory[];
@@ -13,6 +15,20 @@ interface IPropCategoryList {
 const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
 
     const [openAddCategory, setOpenAddCategory] = useState(false);
+    const [openShowLinks, setOpenShowLinks] = useState(false);
+    const [openEditCategory, setOpenEditCategory] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+
+    const openShowLinksHandler = (category_name: string) => {
+        setSelectedCategory(category_name);
+        setOpenShowLinks(true);
+    }
+
+    const closeShowLinks = () => {
+        setOpenShowLinks(false);
+        setSelectedCategory("");
+    }
 
     const openAddCategoryHandler = () => {
         setOpenAddCategory(true);
@@ -27,8 +43,18 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
         closeAddCategoryHandler();
     }
 
-    const openEditCategory = (category_name:string) => {
+    const openEditCategoryHandler = (category_name:string) => {
+        setSelectedCategory(category_name);
 
+    }
+
+    const closeEditCategoryHandler = () => {
+        setOpenEditCategory(false);
+        setSelectedCategory("");
+    }
+
+    const saveEditedCategory = (category: ICategory) => {
+        
     }
 
     const capitalizeFirstLetter = (str) => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
@@ -57,7 +83,7 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
                     </Grid>
                     <br/>
                     <TableContainer component={Paper}>
-                        <Table sx={{  }} aria-label="simple table">
+                        <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Category Name</TableCell>
@@ -81,6 +107,12 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
                                             >
                                                 <Edit />
                                             </IconButton>
+
+                                            <IconButton
+                                                onClick={() => openShowLinksHandler(row.category_name)}
+                                            >
+                                                <Link />
+                                            </IconButton>
                                         
                                         </TableCell>
                                     </TableRow>
@@ -92,6 +124,8 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
                 </Box>
             </Paper>
             <AddCategoryDialog open={openAddCategory} closeDialog={closeAddCategoryHandler} saveNewCategory={saveNewCategory} />
+            <EditCategoryDialog open={openAddCategory} closeDialog={closeAddCategoryHandler} selectedCategory={selectedCategory} saveEditedCategory={saveEditedCategory} />
+            <ShowLinksDialog open={openShowLinks} closeDialog={closeShowLinks} selectedCategory={selectedCategory} />
         </>
     );
 }
@@ -102,44 +136,6 @@ export default CategoryList;
 
 /*
 
-
-                <Typography variant="h4">Link</Typography>
-                <br />
-                <div>
-                  <Typography variant="subtitle1">RSS Haugaland:</Typography>
-                  <a href="https://www.infokanal.com/haugaland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/haugaland_rss.xml</a>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    RSS Sunnhordland:
-                  </Typography>
-                  <a href="https://www.infokanal.com/sunnhordland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/sunnhordland_rss.xml</a>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    Vertical integrations Haugaland: </Typography>
-                  <a href="https://www.infokanal.com/admin/haugaland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland.html</a>
-
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    Vertical integrations Sunnhordland: </Typography>
-                  <a href="https://www.infokanal.com/admin/sunnhordland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland.html</a>
-
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    Horizontal integration Haugaland: </Typography>
-                  <a href="https://www.infokanal.com/admin/haugaland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_horizontal.html</a>
-
-                </div>
-
-                <div>
-                  <Typography variant="subtitle1">
-                    Horizontal integration Sunnhordland:
-                  </Typography>
-                  <a href="https://www.infokanal.com/admin/sunnhordland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland_horizontal.html</a>
-                </div>
 
 
 */
