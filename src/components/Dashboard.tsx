@@ -1,10 +1,7 @@
 import {
   AppBar,
-  Autocomplete,
-  AutocompleteRenderInputParams,
   Box,
   Button,
-  Chip,
   Container,
   Dialog,
   DialogActions,
@@ -30,6 +27,9 @@ import AddIcon from "@mui/icons-material/Add";
 import { Delete, Edit, Image } from "@mui/icons-material";
 import axios from "axios";
 import PictureList from "./PictureList";
+import { IPropsCategoryItem } from "./CategoryItem";
+import CategoryList from "./CategoryList";
+import { ICategory } from "../interfaces/category.interface";
 
 interface IDashboardProps {
   config: {
@@ -41,19 +41,15 @@ interface IDashboardProps {
     }[];
     within_time: string;
     show_items: number;
-    haugaland_keywords: string[];
-    sunnhordland_keywords: string[];
+    categories: ICategory[];
   }
 }
 
 const Dashboard = ({ config }: IDashboardProps) => {
-  const alreadySavedKeywords1 = config.haugaland_keywords;
-  const alreadySavedKeywords2 = config.sunnhordland_keywords;
 
   const [withinTime, setWithinTime] = useState<string>(config.within_time)
   const [showItems, setShowItems] = useState<number>(config.show_items || 0)
-  const [selectedKeywords1, setKeywords1] = useState<string[]>(alreadySavedKeywords1);
-  const [selectedKeywords2, setKeywords2] = useState<string[]>(alreadySavedKeywords2);
+  const [categories, setCategories] = useState(config.categories)
   const [twitterAccounts, setTwitterAccounts] = useState(config.twitter_accounts);
   const [openNewTwitterAccDialog, setOpenNewTwitterAccDialog] = useState(false);
   const [openDeleteTwitterAccDialog, setOpenDeleteNewTwitterAccDialog] =
@@ -75,6 +71,10 @@ const Dashboard = ({ config }: IDashboardProps) => {
   });
   const [selectedTwitterAccount, setSelectedTwitterAccount] =
     useState<string>();
+
+  const addNewCategory = (category: ICategory) => {
+    setCategories([...categories, category]);
+  }
 
   const openEditTwitterAccount = (username: string) => {
     selectTwitterAccount(username);
@@ -200,8 +200,7 @@ const Dashboard = ({ config }: IDashboardProps) => {
     const data = {
       within_time: withinTime,
       show_items: showItems,
-      haugaland_keywords: selectedKeywords1,
-      sunnhordland_keywords: selectedKeywords2,
+      categories: categories,
       twitter_accounts: twitterAccounts
     }
     try {
@@ -273,62 +272,8 @@ const Dashboard = ({ config }: IDashboardProps) => {
                   autoFocus
                 />
                 <br />
-
-                <Autocomplete
-                  style={{ paddingTop: "10px" }}
-                  multiple
-                  id="keywords1"
-                  freeSolo
-                  fullWidth
-                  placeholder="1"
-
-                  value={selectedKeywords1}
-                  onChange={(event, newValue) => {
-                    setKeywords1([...newValue]);
-                  }}
-                  options={alreadySavedKeywords1}
-                  getOptionLabel={(option) => option}
-                  renderTags={(tagValue, getTagProps) =>
-                    tagValue.map((option, index) => (
-                      <Chip label={option} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      required
-                      {...params}
-                      label="Haugaland Keywords"
-                      placeholder="Haugaland keyword"
-                    />
-                  )}
-                />
                 <br />
-                <Autocomplete
-                  multiple
-                  id="keywords2"
-                  freeSolo
-                  fullWidth
-                  value={selectedKeywords2}
-                  onChange={(event, newValue) => {
-                    setKeywords2([...newValue]);
-                  }}
-                  options={alreadySavedKeywords2}
-                  getOptionLabel={(option) => option}
-                  renderTags={(tagValue, getTagProps) =>
-                    tagValue.map((option, index) => (
-                      <Chip label={option} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      required
-                      {...params}
-                      label="Sunnhordland Keywords"
-                      placeholder="Sunnhordland keyword"
-                    />
-                  )}
-                />
-                <br />
+
                 <Divider />
                 <br />
                 <Typography variant="h5"> Twitter Accounts</Typography>
@@ -384,72 +329,22 @@ const Dashboard = ({ config }: IDashboardProps) => {
                 </TableContainer>
                 <Divider />
 
-                <Button
-                  onClick={saveData}
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  SAVE
-                </Button>
+
               </Box>
+
             </Paper>
+            <Button
+              onClick={saveData}
+              fullWidth
+              size="large"
+              variant="contained"
+              sx={{mb: 2 }}
+            >
+              SAVE
+            </Button>
           </Grid>
           <Grid item xs={12} lg={4} style={{ textOverflow: 'ellipsis' }}>
-            <Paper
-              variant="outlined"
-              sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
-            >
-              <Box
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: '100%',
-                  display: 'inline-block'
-                }}
-              >
-                <Typography variant="h4">Link</Typography>
-                <br />
-                <div>
-                  <Typography variant="subtitle1">RSS Haugaland:</Typography>
-                  <a href="https://www.infokanal.com/admin/haugaland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_rss.xml</a>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    RSS Sunnhordland:
-                  </Typography>
-                  <a href="https://www.infokanal.com/admin/sunnhordland_rss.xml" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland_rss.xml</a>
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    Vertical integrations Haugaland: </Typography>
-                  <a href="https://www.infokanal.com/admin/haugaland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland.html</a>
-
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    Vertical integrations Sunnhordland: </Typography>
-                  <a href="https://www.infokanal.com/admin/sunnhordland.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland.html</a>
-
-                </div>
-                <div>
-                  <Typography variant="subtitle1">
-                    Horizontal integration Haugaland: </Typography>
-                  <a href="https://www.infokanal.com/admin/haugaland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/haugaland_horizontal.html</a>
-
-                </div>
-
-                <div>
-                  <Typography variant="subtitle1">
-                    Horizontal integration Sunnhordland:
-                  </Typography>
-                  <a href="https://www.infokanal.com/admin/sunnhordland_horizontal.html" target="_blank" rel="noopener">https://www.infokanal.com/admin/sunnhordland_horizontal.html</a>
-                </div>
-
-
-
-              </Box>
-            </Paper>
+            <CategoryList categories={categories} addNewCategory={addNewCategory} />
           </Grid>
         </Grid>
 
