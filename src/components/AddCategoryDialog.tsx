@@ -13,11 +13,20 @@ const AddCategoryDialog = ({ open, closeDialog, saveNewCategory }: IAddCategoryD
         category_name: "",
         page_title: "",
         page_title_horizontal: "",
-        keywords: []
+        keywords: [],
+        negative_keywords: [],
     });
 
     const save = () => {
         saveNewCategory(newCategory)
+        setNewCategory({
+            category_name: "",
+            page_title: "",
+            page_title_horizontal: "",
+            keywords: [],
+            negative_keywords: [],
+        });
+        closeDialog()
     }
 
     return (
@@ -102,6 +111,38 @@ const AddCategoryDialog = ({ open, closeDialog, saveNewCategory }: IAddCategoryD
                             {...params}
                             label="Keywords"
                             placeholder="keywords"
+                        />
+                    )}
+                />
+                <Autocomplete
+                    style={{ paddingTop: "10px" }}
+                    multiple
+                    id="negativekeywords1"
+                    freeSolo
+                    fullWidth
+                    placeholder="1"
+
+                    value={newCategory.negative_keywords}
+                    onChange={(event, newValue) => {
+                        setNewCategory({
+                            ...newCategory,
+                            negative_keywords: [...newValue]
+                        }
+                        );
+                    }}
+                    options={[]}
+                    getOptionLabel={(option) => option}
+                    renderTags={(tagValue, getTagProps) =>
+                        tagValue.map((option, index) => (
+                            <Chip label={option} {...getTagProps({ index })} />
+                        ))
+                    }
+                    renderInput={(params) => (
+                        <TextField
+                            required
+                            {...params}
+                            label="Negative Keywords"
+                            placeholder="Negative keywords"
                         />
                     )}
                 />

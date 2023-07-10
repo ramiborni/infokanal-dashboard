@@ -1,22 +1,26 @@
 import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { Edit, Link } from "@mui/icons-material";
+import { Delete, Edit, Link } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import { ICategory } from "../interfaces/category.interface";
 import AddCategoryDialog from "./AddCategoryDialog";
 import { useState } from "react";
 import ShowLinksDialog from "./ShowLinksDialog";
 import EditCategoryDialog from "./EditCategoryDialog";
+import DeleteCategoryDialog from "./DeleteCategoryDialog";
 
 interface IPropCategoryList {
     categories: ICategory[];
     addNewCategory: (category: ICategory) => void;
+    deleteCategory: (category_name: string) => void;
+    editCategory: (oldCategoryName: string, category: ICategory) => void;
 }
 
-const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
+const CategoryList = ({ categories, addNewCategory, deleteCategory, editCategory }: IPropCategoryList) => {
 
     const [openAddCategory, setOpenAddCategory] = useState(false);
     const [openShowLinks, setOpenShowLinks] = useState(false);
     const [openEditCategory, setOpenEditCategory] = useState(false);
+    const [openDeleteDialog, setOpenDeleteCategory] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
 
 
@@ -38,14 +42,14 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
         setOpenAddCategory(false);
     }
 
-    const saveNewCategory = (category:ICategory) => {
+    const saveNewCategory = (category: ICategory) => {
         addNewCategory(category);
         closeAddCategoryHandler();
     }
 
-    const openEditCategoryHandler = (category_name:string) => {
+    const openEditCategoryHandler = (category_name: string) => {
         setSelectedCategory(category_name);
-
+        setOpenEditCategory(true);
     }
 
     const closeEditCategoryHandler = () => {
@@ -53,11 +57,27 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
         setSelectedCategory("");
     }
 
-    const saveEditedCategory = (category: ICategory) => {
-        
+    const openDeleteCategoryHandler = (category_name: string) => {
+        setOpenDeleteCategory(true);
+        setSelectedCategory(category_name);
     }
 
-    const capitalizeFirstLetter = (str) => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
+    const closeDeleteCategoryHandler = () => {
+        setOpenDeleteCategory(false);
+        setSelectedCategory("");
+    }
+
+    const deleteCategoryHandler = (category_name: string) => {
+        deleteCategory(category_name);
+        setOpenDeleteCategory(false);
+    }
+
+    const saveEditedCategory = (oldCategoryName: string ,category: ICategory) => {
+        editCategory(oldCategoryName,category)
+
+    }
+
+    const capitalizeFirstLetter = (str: string) => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
 
     return (
         <>
@@ -81,7 +101,7 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
                             Add Category
                         </Button>
                     </Grid>
-                    <br/>
+                    <br />
                     <TableContainer component={Paper}>
                         <Table aria-label="simple table">
                             <TableHead>
@@ -102,18 +122,25 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
                                         </TableCell>
                                         <TableCell align="center">{row.keywords.length}</TableCell>
                                         <TableCell align="right">
-                                            <IconButton
-                                                onClick={() => openEditCategory(row.category_name)}
-                                            >
-                                                <Edit />
-                                            </IconButton>
 
                                             <IconButton
                                                 onClick={() => openShowLinksHandler(row.category_name)}
                                             >
                                                 <Link />
                                             </IconButton>
-                                        
+
+                                            <IconButton
+                                                onClick={() => openEditCategoryHandler(row.category_name)}
+                                            >
+                                                <Edit />
+                                            </IconButton>
+
+                                            <IconButton
+                                                onClick={() => openDeleteCategoryHandler(row.category_name)}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -123,8 +150,22 @@ const CategoryList = ({ categories, addNewCategory }: IPropCategoryList) => {
 
                 </Box>
             </Paper>
+            {
+                console.log(
+                    categories.find(c => c.category_name === selectedCategory) ?? {
+                        category_name: "", page_title: "", page_title_horizontal: "", keywords: []
+                    }
+                )
+            }
             <AddCategoryDialog open={openAddCategory} closeDialog={closeAddCategoryHandler} saveNewCategory={saveNewCategory} />
-            <EditCategoryDialog open={openAddCategory} closeDialog={closeAddCategoryHandler} selectedCategory={selectedCategory} saveEditedCategory={saveEditedCategory} />
+            <EditCategoryDialog open={openEditCategory} closeDialog={closeEditCategoryHandler} selectedCategory={
+                categories.find(c => c.category_name === selectedCategory) ?? {
+                    category_name: "", page_title: "", page_title_horizontal: "", keywords: [], negative_keywords: []
+                }
+            } saveEditedCategory={saveEditedCategory} />
+            <DeleteCategoryDialog open={openDeleteDialog} closeDialog={closeDeleteCategoryHandler} selectedCategory={
+                selectedCategory
+            } deleteCategory={deleteCategoryHandler} />
             <ShowLinksDialog open={openShowLinks} closeDialog={closeShowLinks} selectedCategory={selectedCategory} />
         </>
     );

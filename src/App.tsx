@@ -31,7 +31,7 @@ function App() {
     }
   };
 
-  return <>{isLoggedIn ? <Dashboard config={configData}/> : <Login loginHandler={login} />}</>;
+  return <>{isLoggedIn ? <Dashboard config={configData} setConfigData={setConfigData}/> : <Login loginHandler={login} />}</>;
 }
 
 export default App;

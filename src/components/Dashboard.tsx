@@ -1,4 +1,5 @@
 import {
+  Alert,
   AppBar,
   Box,
   Button,
@@ -12,6 +13,7 @@ import {
   Grid,
   IconButton,
   Paper,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -22,7 +24,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { Delete, Edit, Image } from "@mui/icons-material";
 import axios from "axios";
@@ -42,10 +44,11 @@ interface IDashboardProps {
     within_time: string;
     show_items: number;
     categories: ICategory[];
-  }
+  },
+  setConfigData: React.Dispatch<any>
 }
 
-const Dashboard = ({ config }: IDashboardProps) => {
+const Dashboard = ({ config, setConfigData }: IDashboardProps) => {
 
   const [withinTime, setWithinTime] = useState<string>(config.within_time)
   const [showItems, setShowItems] = useState<number>(config.show_items || 0)
@@ -72,8 +75,23 @@ const Dashboard = ({ config }: IDashboardProps) => {
   const [selectedTwitterAccount, setSelectedTwitterAccount] =
     useState<string>();
 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+
   const addNewCategory = (category: ICategory) => {
     setCategories([...categories, category]);
+  }
+
+  const deleteCategory = (category_name: string) => {
+    setCategories(c => c.filter(item => item.category_name !== category_name));
+  }
+
+  const editCategory = (oldCategoryName: string, category: ICategory) => {
+    setCategories((prevCategories =>
+      prevCategories.map(prevCategory =>
+        prevCategory.category_name === oldCategoryName ? category : prevCategory
+      )
+    ));
   }
 
   const openEditTwitterAccount = (username: string) => {
@@ -205,11 +223,18 @@ const Dashboard = ({ config }: IDashboardProps) => {
     }
     try {
       await axios.post('https://api.infokanal.com/update-config', data)
-      alert('config saved')
+      setConfigData(data)
+      setOpenSnackbar(true)
     } catch (e) {
       alert('config saving has been failed, please try again.')
     }
   }
+
+  useEffect(() => {
+    if (config.categories !== categories) {
+      saveData()
+    }
+  }, [categories])
 
   return (
     <>
@@ -338,13 +363,13 @@ const Dashboard = ({ config }: IDashboardProps) => {
               fullWidth
               size="large"
               variant="contained"
-              sx={{mb: 2 }}
+              sx={{ mb: 2 }}
             >
               SAVE
             </Button>
           </Grid>
           <Grid item xs={12} lg={4} style={{ textOverflow: 'ellipsis' }}>
-            <CategoryList categories={categories} addNewCategory={addNewCategory} />
+            <CategoryList categories={categories} addNewCategory={addNewCategory} deleteCategory={deleteCategory} editCategory={editCategory} />
           </Grid>
         </Grid>
 
@@ -513,6 +538,13 @@ const Dashboard = ({ config }: IDashboardProps) => {
           <Button onClick={handleClosePicsTwitterAccDialog}>Close</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2000}
+        onClose={() => { setOpenSnackbar(false) }}
+      >
+        <Alert severity="success">Data saved successfully</Alert>
+      </Snackbar>
     </>
   );
 };
