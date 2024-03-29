@@ -16,9 +16,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import GoogleSignInButton from "../github-auth-button";
+import axios from "axios";
+import { useToast } from "../ui/use-toast";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Enter a valid email address" }),
+  username: z.string(),
+  password: z.string(),
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
@@ -28,37 +31,73 @@ export default function UserAuthForm() {
   const callbackUrl = searchParams.get("callbackUrl");
   const [loading, setLoading] = useState(false);
   const defaultValues = {
-    email: "demo@gmail.com",
+    username: "",
+    password: "",
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
+  const { toast } = useToast();
 
   const onSubmit = async (data: UserFormValue) => {
-    signIn("credentials", {
-      email: data.email,
-      callbackUrl: callbackUrl ?? "/dashboard",
-    });
+    setLoading(true);
+    try {
+      const isLoggedin = await signIn("credentials", {
+        ...data,
+        redirect: true,
+        callbackUrl: "/dashboard"
+      });
+      if (isLoggedin!.error !== null) {
+        toast({
+          variant: "destructive",
+          title: "Wrong credentials",
+          description: "Incorrect Login Details!!",
+        });
+      }
+    } catch (e: any) {
+      console.error(e);
+      if (e.response.status !== 200) {
+        toast({
+          variant: "destructive",
+          title: "Wrong credentials",
+          description: "Check your username and password please",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Something wrong happened, please try again",
+          description: "There was a problem with your request.",
+        });
+      }
+    }
+    finally{
+      setLoading(false);
+    }
+  };
+
+  const userSubmit = async (e: any) => {
+    e.preventDefault();
+    await form.handleSubmit(onSubmit)(e);
   };
 
   return (
     <>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 w-full"
+          onSubmit={userSubmit}
+          className="space-y-0 w-full"
         >
           <FormField
             control={form.control}
-            name="email"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input
-                    type="email"
-                    placeholder="Enter your email..."
+                    type="text"
+                    placeholder="Enter your username..."
                     disabled={loading}
                     {...field}
                   />
@@ -67,23 +106,31 @@ export default function UserAuthForm() {
               </FormItem>
             )}
           />
-
+            {" "}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password..."
+                    disabled={loading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="py-3"></div>
           <Button disabled={loading} className="ml-auto w-full" type="submit">
-            Continue With Email
+            Login
           </Button>
         </form>
       </Form>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-      </div>
-      <GoogleSignInButton />
     </>
   );
 }

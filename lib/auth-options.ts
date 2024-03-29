@@ -1,36 +1,36 @@
-import { NextAuthOptions } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
+import { NextAuthOptions, User } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
+import axios from "axios";
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.AUTH_SECRET,
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID ?? "",
-      clientSecret: process.env.GITHUB_SECRET ?? "",
-    }),
     CredentialProvider({
       credentials: {
-        email: {
-          label: "email",
-          type: "email",
-          placeholder: "example@gmail.com",
-        },
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        const user = { id: "1", name: "John", email: credentials?.email };
-        if (user) {
-          // Any object returned will be saved in `user` property of the JWT
-          return user;
-        } else {
-          // If you return null then an error will be displayed advising the user to check their details.
-          return null;
-
-          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
+        const result = await axios.post("https://api.infokanal.com/login", credentials);
+  
+        // If no error and we have user data, return it
+        if (result.status === 200) {
+          return {
+            id:  credentials?.username,
+            username : credentials?.username
+          } as User
         }
+        // Return null if user data could not be retrieved
+        return null
       },
     }),
   ],
   pages: {
     signIn: "/", //sigin page
+  },
+  callbacks: {
+    async redirect({url, baseUrl}) {
+      return url.startsWith(baseUrl) ? url : baseUrl + '/dashboard';
+    }
   },
 };
