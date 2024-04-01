@@ -1,16 +1,31 @@
+"use client";
+
 import { Metadata } from "next";
 import Link from "next/link";
 import UserAuthForm from "@/components/forms/user-auth-form";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export const metadata: Metadata = {
-  title: "Authentication",
-  description: "Authentication forms built using the components.",
-};
 
 export default function AuthenticationPage() {
+
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace('/dashboard');
+    }
+  }, [session, status, router]);
+
+  if (status === "loading" || status === "authenticated") {
+    return <div className="flex flex-col items-center py-8">Loading...</div>;
+  }
+  
   return (
     <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <Link
