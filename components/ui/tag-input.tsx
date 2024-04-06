@@ -23,10 +23,10 @@ type OmittedInputProps = Omit<
   "size" | "value"
 >;
 
-export type Tag = {
+export interface Tag {
   id: string;
   text: string;
-};
+}
 
 export interface TagInputProps
   extends OmittedInputProps,

@@ -61,7 +61,7 @@ export default function page() {
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Summarized News during this year</CardTitle>
+              <CardTitle>Summarized News during this month</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               <Overview />

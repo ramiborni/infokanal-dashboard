@@ -17,11 +17,7 @@ export default function DashboardLayout({
       <Header />
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        <main className="w-full py-28 flex flex-col items-center">
-          <div className="max-w-screen-xl w-full">
-            {children}
-          </div>
-        </main>
+        <main className="w-full pt-16">{children}</main>
       </div>
     </>
   );
