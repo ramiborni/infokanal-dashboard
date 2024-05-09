@@ -50,7 +50,7 @@ const Keywords = ({inputTitle, inputName, inputPlaceholder, tags, setTags} : Key
     toast({
       title: "You submitted the following values:",
       description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+        <pre className="mt-2 w-full rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
@@ -62,7 +62,7 @@ const Keywords = ({inputTitle, inputName, inputPlaceholder, tags, setTags} : Key
     <TagInput
       placeholder={inputPlaceholder}
       tags={tags}
-      className="sm:min-w-[450px]"
+      className="w-full"
       setTags={(newTags) => {
         setTags(newTags);
         setValue(inputName, newTags as [Tag, ...Tag[]]);

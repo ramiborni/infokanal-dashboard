@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+} from "../../ui/dialog";
+import { Input } from "../../ui/input";
+import { Label } from "../../ui/label";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,14 +20,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "../../ui/form";
 import { useState } from "react";
 import axios from "axios";
 import { API_URL } from "@/constants/api-url";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AddModuleDialogProps {
   open: boolean;
   setOpen: any;
+  setOpenSecondStepDialog: any;
+  setNewModule: any;
 }
 
 const formSchema = z.object({
@@ -35,7 +38,9 @@ const formSchema = z.object({
   rssName: z.string().min(2),
 });
 
-const AddModuleDialog = ({ open, setOpen }: AddModuleDialogProps) => {
+const AddModuleDialog = ({ open, setOpen, setOpenSecondStepDialog, setNewModule }: AddModuleDialogProps) => {
+  const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,9 +53,20 @@ const AddModuleDialog = ({ open, setOpen }: AddModuleDialogProps) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try{
         setIsLoading(true);
-        const res = await axios.post(API_URL, values);
+        const data = {
+          name: values.name,
+          "slang": values.rssName
+        }
+        const res = await axios.post(`${API_URL}/feed/modules/`, data);
+        setNewModule(data);
+        setOpen(false);
+        setOpenSecondStepDialog(true);
     }catch(e){
-
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request."
+      });
     }finally{
         setIsLoading(false);
     }

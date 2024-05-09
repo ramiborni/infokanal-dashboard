@@ -29,9 +29,10 @@ interface AddTwitterAccountDialogProps {
 }
 
 const formSchema = z.object({
-  username: z.string(),
-  prefix: z.string(),
-  suffix: z.string()
+  username:  z.string(),
+  prefix:  z.string(),
+  suffix:  z.string(),
+
 });
 
 const AddTwitterAccountDialog = ({
@@ -57,7 +58,6 @@ const AddTwitterAccountDialog = ({
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
-    twitterSettings.twitter_accounts.push(values);
 
     try {
       setIsLoading(true);

@@ -10,13 +10,87 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Keywords from "@/components/modules/keywords";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tag } from "@/components/ui/tag-input";
+import { useToast } from "@/components/ui/use-toast";
+import { ExtendedModule, Source } from "@/types/module";
+import axios from "axios";
+import { API_URL } from "@/constants/api-url";
+import SpinnerLoader from "@/components/ui/spinner-loader";
+import ModuleCard from "@/components/modules/module-card";
+import { v4 as uuid } from "uuid";
+import ModuleSettingsKeywordsCard from "@/components/modules/module-settings/module-settings-keywords-card";
+import ModuleSettingsSourcesCard from "@/components/modules/module-settings/module-settings-sources-card";
+import { isNil } from "ramda";
 
 const SettingsPage = ({ params }: { params: { id: string } }) => {
+  const { toast } = useToast();
+
   const id = params.id;
+
   const [keywords, setKeywords] = useState<Tag[]>([]);
-  const [negativeLKeywords, setNegativeKeywords] = useState<Tag[]>([]);
+  const [negativeKeywords, setNegativeKeywords] = useState<Tag[]>([]);
+
+  const [sources, setSources] = useState<Source[]>([]);
+
+  const [module, setModule] = useState<ExtendedModule>();
+  const [isLoading, setIsLoading] = useState(true);
+
+
+  useEffect(() => {
+
+    const getModules = async () => {
+      setIsLoading(true);
+      try {
+        const res = await axios.get(API_URL + "/feed/modules/" + id + "/");
+        const currentModule: ExtendedModule = res.data;
+
+        setModule(currentModule);
+
+        console.log(currentModule);
+
+        if (!isNil(currentModule.rss_sources) && !isNil(currentModule.rss_sources)) {
+          if (currentModule.rss_sources.sources.length > 0)
+            setSources(currentModule.rss_sources.sources);
+        }
+
+        if (!isNil(currentModule?.settings) && !isNil(currentModule?.settings.keywords)) {
+          if (currentModule?.settings.keywords.length! > 0)
+            setKeywords(currentModule?.settings.keywords.map(
+              k => {
+                return ({
+                  "id": uuid(),
+                  "text": k
+                } as Tag);
+              }
+            )!);
+        }
+
+        if (currentModule?.settings.negative_keywords.length! > 0) {
+          setNegativeKeywords(currentModule?.settings.negative_keywords.map(
+            k => {
+              return ({
+                "id": uuid(),
+                "text": k
+              } as Tag);
+            }
+          )!);
+        }
+
+      } catch (e) {
+        console.error(e);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "Couldn't fetch Modules, please reload the page."
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getModules().then();
+  }, []);
 
   const ModuleHeader = () => {
     return (
@@ -42,7 +116,7 @@ const SettingsPage = ({ params }: { params: { id: string } }) => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <p className="text-muted-foreground">{id}</p>
+            <p className="text-muted-foreground">{module?.name}</p>
           </div>
         </div>
       </div>
@@ -51,42 +125,27 @@ const SettingsPage = ({ params }: { params: { id: string } }) => {
 
   return (
     <>
-      <ScrollArea className="h-full">
-        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-          <div className="w-full flex-col items-center justify-between space-y-8">
-            <ModuleHeader />
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Keywords
-                </CardTitle>
-                <CardDescription>
-                  Update keywords and negative keywords to help AI providing the right news for you
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-y-8">
-                <div className="flex flex-col gap-y-2">
-                  <Keywords inputName="keywords"
-                            inputTitle="Keywords"
-                            inputPlaceholder="Keywords thats AI use to filter news"
-                            setTags={setKeywords}
-                            tags={keywords}
-                  />
-                  <Keywords inputName="negativeKeywords"
-                            inputTitle="Negative Keywords"
-                            inputPlaceholder="Negative Keywords thats AI use to filter news"
-                            setTags={setNegativeKeywords}
-                            tags={negativeLKeywords}
-                  />
-                </div>
-                <div className="flex flex-row justify-end">
-                  <Button>Save</Button>
-                </div>
-              </CardContent>
-            </Card>
+      {
+        isLoading ? <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+          <SpinnerLoader></SpinnerLoader></div> : <ScrollArea className="h-full">
+          <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+            <div className="w-full flex-col items-center justify-between space-y-8">
+              <ModuleHeader />
+              <ModuleSettingsSourcesCard sources={sources}
+                                         setSources={setSources}
+                                         slang={id}
+              />
+              <ModuleSettingsKeywordsCard keywords={keywords}
+                                          setKeywords={setKeywords}
+                                          negativeKeywords={negativeKeywords}
+                                          setNegativeKeywords={setNegativeKeywords}
+                                          slang={id}
+              />
+
+            </div>
           </div>
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      }
     </>
   );
 };

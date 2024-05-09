@@ -142,64 +142,68 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (
-        delimiterList
-          ? delimiterList.includes(e.key)
-          : e.key === delimiter || e.key === Delimiter.Enter
-      ) {
-        e.preventDefault();
-        const newTagText = inputValue.trim();
-
-        // Check if the tag is in the autocomplete options if restrictTagsToAutocomplete is true
+      try{
         if (
-          restrictTagsToAutocompleteOptions &&
-          !autocompleteOptions?.some((option) => option.text === newTagText)
+          delimiterList
+            ? delimiterList.includes(e.key)
+            : e.key === delimiter || e.key === Delimiter.Enter
         ) {
-          toast({
-            title: "Invalid Tag",
-            description: "Please select a tag from the autocomplete options.",
-            variant: "destructive",
-          });
-          return;
-        }
+          e.preventDefault();
+          const newTagText = inputValue.trim();
 
-        if (validateTag && !validateTag(newTagText)) {
-          return;
-        }
+          // Check if the tag is in the autocomplete options if restrictTagsToAutocomplete is true
+          if (
+            restrictTagsToAutocompleteOptions &&
+            !autocompleteOptions?.some((option) => option.text === newTagText)
+          ) {
+            toast({
+              title: "Invalid Tag",
+              description: "Please select a tag from the autocomplete options.",
+              variant: "destructive",
+            });
+            return;
+          }
 
-        if (minLength && newTagText.length < minLength) {
-          console.warn("Tag is too short");
-          toast({
-            title: "Tag is too short",
-            description: "Please enter a tag with more characters",
-            variant: "destructive",
-          });
-          return;
-        }
+          if (validateTag && !validateTag(newTagText)) {
+            return;
+          }
 
-        // Validate maxLength
-        if (maxLength && newTagText.length > maxLength) {
-          toast({
-            title: "Tag is too long",
-            description: "Please enter a tag with less characters",
-            variant: "destructive",
-          });
-          console.warn("Tag is too long");
-          return;
-        }
+          if (minLength && newTagText.length < minLength) {
+            console.warn("Tag is too short");
+            toast({
+              title: "Tag is too short",
+              description: "Please enter a tag with more characters",
+              variant: "destructive",
+            });
+            return;
+          }
 
-        const newTagId = uuid();
+          // Validate maxLength
+          if (maxLength && newTagText.length > maxLength) {
+            toast({
+              title: "Tag is too long",
+              description: "Please enter a tag with less characters",
+              variant: "destructive",
+            });
+            console.warn("Tag is too long");
+            return;
+          }
 
-        if (
-          newTagText &&
-          (allowDuplicates || !tags.some((tag) => tag.text === newTagText)) &&
-          (maxTags === undefined || tags.length < maxTags)
-        ) {
-          setTags([...tags, { id: newTagId, text: newTagText }]);
-          onTagAdd?.(newTagText);
-          setTagCount((prevTagCount) => prevTagCount + 1);
+          const newTagId = uuid();
+
+          if (
+            newTagText &&
+            (allowDuplicates || !tags.some((tag) => tag.text === newTagText)) &&
+            (maxTags === undefined || tags.length < maxTags)
+          ) {
+            setTags([...tags, { id: newTagId, text: newTagText }]);
+            onTagAdd?.(newTagText);
+            setTagCount((prevTagCount) => prevTagCount + 1);
+          }
+          setInputValue("");
         }
-        setInputValue("");
+      }catch(e){
+        console.error(e)
       }
     };
 

@@ -8,17 +8,54 @@ import { Switch } from "@/components/ui/switch";
 import { CogIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ExtendedModule } from "@/types/module";
+import axios from "axios";
+import { API_URL } from "@/constants/api-url";
+import { useToast } from "@/components/ui/use-toast";
+import SpinnerLoader from "@/components/ui/spinner-loader";
 
 const ModulePage = ({ params }: { params: { id: string } }) => {
   const id = params.id;
-  const [module, setModule] = useState();
+
+  const { toast } = useToast();
+
+
+  const [module, setModule] = useState<ExtendedModule>();
+
   const [autoAi, setAutoAI] = useState<boolean>(false);
 
-  useEffect(() => {}, [id]);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   const aiAutoChange = () => {
     setAutoAI(!autoAi);
-  }
+  };
+
+  useEffect(() => {
+
+    const getModules = async () => {
+      setIsLoading(true);
+      try {
+        const res = await axios.get(API_URL + "/feed/modules/"+id+"/");
+        console.log(res.data)
+        const data: ExtendedModule = res.data;
+
+        setModule(data);
+
+      } catch (e) {
+        console.error(e);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "Couldn't fetch Modules, please reload the page."
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getModules().then();
+  }, []);
 
 
   const ModuleHeader = () => {
@@ -40,7 +77,7 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
                 </Button>
               </Link>
             </div>
-            <p className="text-muted-foreground">{id}</p>
+            <p className="text-muted-foreground">{module?.name}</p>
           </div>
         </div>
       </div>
@@ -51,12 +88,18 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
     <>
       <ScrollArea className="h-full">
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-          <div className="w-full flex-col items-center justify-between space-y-2">
-            <ModuleHeader />
-          </div>
-          <div>
-            <ModuleNewsList/>
-          </div>
+          {
+            isLoading ?
+              <SpinnerLoader></SpinnerLoader> : <>
+                <div className="w-full flex-col items-center justify-between space-y-2">
+                  <ModuleHeader />
+                </div>
+                <div>
+                  <ModuleNewsList />
+                </div>
+              </>
+          }
+
         </div>
       </ScrollArea>
     </>

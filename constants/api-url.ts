@@ -1,1 +1,1 @@
-export const API_URL = "https://services.infokanal.com"
+export const API_URL = process.env.NODE_ENV === "development" ? "http://localhost:8000" :  "https://services.infokanal.com"
