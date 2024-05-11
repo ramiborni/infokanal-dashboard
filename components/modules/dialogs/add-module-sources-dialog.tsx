@@ -45,7 +45,9 @@ const formSchema = z.object({
     rssName: z.string(),
     rssLink: z.string(),
     scrapeWebsite: z.boolean().default(false),
-    isMembership: z.boolean().default(false)
+    isMembership: z.boolean().default(false),
+    require_keywords_verification: z.boolean().default(true)
+
   }).array()
 });
 
@@ -68,7 +70,8 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
           "source_name": s.rssName,
           "source_url": s.rssLink,
           "require_login": s.isMembership,
-          "summarize_from_rss_feed": s.scrapeWebsite
+          "summarize_from_rss_feed": s.scrapeWebsite,
+          "require_keywords_verification": s.require_keywords_verification
         }))
       };
 
@@ -96,7 +99,8 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
       rssName: "",
       rssLink: "",
       isMembership: false,
-      scrapeWebsite: false
+      scrapeWebsite: false,
+      require_keywords_verification: false,
     }]);
   };
 
@@ -156,6 +160,7 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
                   <TableHead className="">Rss Link</TableHead>
                   <TableHead className="w-[120px]">Scrape from Website</TableHead>
                   <TableHead className="w-[120px]">Require Login</TableHead>
+                  <TableHead className="w-[40px]">Verify Keywords</TableHead>
                   <TableHead className="w-[30px]">Actions</TableHead>
 
                 </TableRow>
@@ -190,6 +195,17 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
                                   }
                                 }, index)} />
                       </TableCell>
+
+                      <TableCell>
+                        <Switch checked={s.require_keywords_verification}
+                                onCheckedChange={(e) => updateSources({
+                                  target: {
+                                    "name": "require_keywords_verification",
+                                    "value": e
+                                  }
+                                }, index)} />
+                      </TableCell>
+
 
                       <TableCell>
                         <Button onClick={() => removeSource(index)} variant="ghost" size="icon">

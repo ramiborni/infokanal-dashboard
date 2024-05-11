@@ -1,6 +1,7 @@
 "use client";
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { AnalyticsDataChart } from "@/app/(dashboard)/dashboard/page";
 
 function getCurrentMonth() {
   const currentDate = new Date();
@@ -23,11 +24,14 @@ function generateMonthlyData(month:number) {
   return monthlyData;
 }
 
-
-export function Overview() {
+interface OverviewProps {
+  chartData:  AnalyticsDataChart[]
+}
+export function Overview({chartData}: OverviewProps) {
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={generateMonthlyData(getCurrentMonth())}>
+      <BarChart data={chartData}>
+        <Tooltip />
         <XAxis
           dataKey="day"
           stroke="#888888"

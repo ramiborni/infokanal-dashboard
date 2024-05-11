@@ -1,3 +1,5 @@
+"use client";
+
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { Overview } from "@/components/overview";
 import { RecentNews } from "@/components/recent-news";
@@ -10,8 +12,43 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { API_URL } from "@/constants/api-url";
+
+export interface AnalyticsDataChart{
+  day: number;
+  total: number;
+}
+
+interface AnalyticsData{
+  total_summarized: number;
+  total_fetched_news: number;
+  created_module: number;
+  automated_module: number;
+  current_month_summarized_chart: AnalyticsDataChart[];
+  recent_news: any
+}
 
 export default function page() {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<AnalyticsData>();
+  const getStatics = async () => {
+    try{
+      setLoading(true);
+      const res = await axios.get(API_URL + "/feeds/statistics");
+      const result : AnalyticsData = res.data;
+      setData(result)
+    }catch(e){
+
+    }finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    getStatics().then();
+  }, []);
+
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -28,7 +65,7 @@ export default function page() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">500 News</div>
+              <div className="text-2xl font-bold">{data?.total_summarized} News</div>
             </CardContent>
           </Card>
           <Card>
@@ -38,7 +75,7 @@ export default function page() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">2350 News</div>
+              <div className="text-2xl font-bold">{data?.total_fetched_news} News</div>
             </CardContent>
           </Card>
           <Card>
@@ -46,7 +83,7 @@ export default function page() {
               <CardTitle className="text-sm font-medium">Created Modules</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">4</div>
+              <div className="text-2xl font-bold">{data?.created_module} Modules</div>
             </CardContent>
           </Card>
           <Card>
@@ -54,7 +91,7 @@ export default function page() {
               <CardTitle className="text-sm font-medium">Automated Modules</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">3</div>
+              <div className="text-2xl font-bold">{data?.automated_module} Modules</div>
             </CardContent>
           </Card>
         </div>
@@ -64,7 +101,7 @@ export default function page() {
               <CardTitle>Summarized News during this month</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-              <Overview />
+              <Overview chartData={data?.current_month_summarized_chart!} />
             </CardContent>
           </Card>
           <Card className="col-span-4 md:col-span-3">
@@ -72,7 +109,7 @@ export default function page() {
               <CardTitle>Recent Summarized News</CardTitle>
             </CardHeader>
             <CardContent>
-              <RecentNews/>
+              <RecentNews recent={data?.recent_news}/>
             </CardContent>
           </Card>
         </div>

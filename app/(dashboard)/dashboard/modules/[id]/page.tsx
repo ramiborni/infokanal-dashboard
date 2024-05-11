@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { CogIcon } from "lucide-react";
+import { CogIcon, TrashIcon, DeleteIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ExtendedModule } from "@/types/module";
@@ -13,6 +13,7 @@ import axios from "axios";
 import { API_URL } from "@/constants/api-url";
 import { useToast } from "@/components/ui/use-toast";
 import SpinnerLoader from "@/components/ui/spinner-loader";
+import { DeleteModuleDialog } from "@/components/modules/dialogs/delete-module-dialog";
 
 const ModulePage = ({ params }: { params: { id: string } }) => {
   const id = params.id;
@@ -25,6 +26,8 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
   const [autoAi, setAutoAI] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
 
   const aiAutoChange = () => {
@@ -57,13 +60,18 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
     getModules().then();
   }, []);
 
+  const openDialogConfirmDelete = () => {
+    setOpenDeleteDialog(true);
+  }
+
+
 
   const ModuleHeader = () => {
     return (
       <div className="flex flex-row items-center justify-between gap-x-4">
         <div className="flex-grow">
           <div className="flex flex-col mx-auto flex-1">
-            <div className="flex flex-row gap-x-8">
+            <div className="flex flex-row gap-x-4">
               <h2 className="text-3xl font-bold tracking-tight flex-1">
                 Manage Module
               </h2>
@@ -71,11 +79,15 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
                 <Switch onCheckedChange={aiAutoChange} checked={autoAi} id="ai-auto" />
                 <Label htmlFor="ai-auto">Auto AI Summarize</Label>
               </div>
+              <Button onClick={openDialogConfirmDelete} className="hover:border-red-500 border-red-500 hover:text-red-500 text-red-500 hover:bg-red-100" variant="outline" size="icon" >
+                <TrashIcon></TrashIcon>
+              </Button>
               <Link href={"/dashboard/modules/" + id + "/settings/"}>
                 <Button color="primary" variant="default" size="icon">
                   <CogIcon />
                 </Button>
               </Link>
+
             </div>
             <p className="text-muted-foreground">{module?.name}</p>
           </div>
@@ -102,6 +114,7 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
 
         </div>
       </ScrollArea>
+      <DeleteModuleDialog id={id} open={openDeleteDialog} setOpen={setOpenDeleteDialog}/>
     </>
   );
 };
