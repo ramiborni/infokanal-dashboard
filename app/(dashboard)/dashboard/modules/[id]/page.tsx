@@ -30,8 +30,27 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
 
-  const aiAutoChange = () => {
+  const aiAutoChange = async () => {
     setAutoAI(!autoAi);
+    try {
+      const data = {
+        "manual_convert": autoAi
+      };
+
+      const res = await axios.put(`${API_URL}/feed/modules/${id}/settings/`, data);
+      toast({
+        title: "Updated!",
+        description: "Auto AI Summarize has been updated successfully"
+      });
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Couldn't update Auto AI Summarize, please try again."
+      });
+    } finally {
+
+    }
   };
 
   useEffect(() => {
@@ -44,6 +63,7 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
         const data: ExtendedModule = res.data;
 
         setModule(data);
+        setAutoAI(!data.settings.manual_convert);
 
       } catch (e) {
         console.error(e);
@@ -107,7 +127,7 @@ const ModulePage = ({ params }: { params: { id: string } }) => {
                   <ModuleHeader />
                 </div>
                 <div>
-                  <ModuleNewsList />
+                  <ModuleNewsList isAuto={autoAi} id={id} sources={module?.rss_sources.sources!} />
                 </div>
               </>
           }
