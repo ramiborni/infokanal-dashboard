@@ -68,6 +68,7 @@ const AddTwitterCategorySheet = ({
       ...values,
       keywords: values.keywords.map(k => k.text),
       negative_keywords: values.keywords.map(k => k.text),
+      police_municipalities: [],
     };
     twitterSettings.categories.push(filteredResult);
 
@@ -99,7 +100,7 @@ const AddTwitterCategorySheet = ({
         <SheetHeader>
           <SheetTitle>Add New Rss Category</SheetTitle>
           <SheetDescription>
-            To add a new category to the settings, please enter the category's name. Additionally, provide a title to be
+            To add a new category to the settings, please enter the category&apos;s name. Additionally, provide a title to be
             displayed in the vertical iframe, a horizontal title for the horizontal iframe, and specify keywords for the
             scrapper to selectively choose from.
           </SheetDescription>

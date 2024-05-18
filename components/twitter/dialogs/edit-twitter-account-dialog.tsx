@@ -106,7 +106,7 @@ const EditTwitterAccountDialog = ({
           <DialogHeader>
             <DialogTitle>Edit Twitter Account ({twitterName})</DialogTitle>
             <DialogDescription>
-              Make changes to a twitter source. Click save when you're done.
+              Make changes to a twitter source. Click save when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>

@@ -167,7 +167,7 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
               </TableHeader>
               <TableBody>
                 {
-                  sources.map((s, index) => (<TableRow>
+                  sources.map((s, index) => (<TableRow key={index}>
                       <TableCell className="font-semibold">
                         <Input onChange={(e) => updateSources(e, index)} value={s.rssName} name="rssName" />
                       </TableCell>

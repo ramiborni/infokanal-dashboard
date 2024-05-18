@@ -30,7 +30,7 @@ interface AnalyticsData{
   recent_news: any
 }
 
-export default function page() {
+export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AnalyticsData>();
   const getStatics = async () => {

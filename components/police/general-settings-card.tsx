@@ -90,7 +90,7 @@ const GeneralSettingsCard = ({twitterConfig} : GeneralSettingsCardProps) => {
                     <Input type="number" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Setting this field to 0 will disable it in the scraper. If you set a different number, it will establish a priority for this field, causing the scraper to disregard the 'Within Time' parameter.
+                    Setting this field to 0 will disable it in the scraper. If you set a different number, it will establish a priority for this field, causing the scraper to disregard the &apos;Within Time&apos; parameter.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

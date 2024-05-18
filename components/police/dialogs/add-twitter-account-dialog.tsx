@@ -88,7 +88,7 @@ const AddTwitterAccountDialog = ({
           <DialogHeader>
             <DialogTitle>Add New Twitter Account</DialogTitle>
             <DialogDescription>
-              Add a new twitter source for the scrapper. Click save when you're done.
+              Add a new twitter source for the scrapper. Click save when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>

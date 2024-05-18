@@ -172,7 +172,7 @@ const ModuleSettingsSourcesCard = ({ slang, sources, setSources }: ModuleSetting
             </TableHeader>
             <TableBody>
               {
-                sources.map((s, index) => (<TableRow>
+                sources.map((s, index) => (<TableRow key={index}>
                     <TableCell className="font-semibold">
                       <Input onChange={(e) => updateSources(e, index)} value={s.source_name} name="source_name" />
                     </TableCell>
