@@ -130,4 +130,10 @@ export const navItems: NavItem[] = [
     icon: "twitter",
     label: "twitter",
   },
+  {
+    title: "Police News",
+    href: "/dashboard/police",
+    icon: "police",
+    label: "police"
+  }
 ];

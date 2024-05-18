@@ -23,7 +23,7 @@ import { v4 as uuid } from "uuid";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SpinnerLoader from "@/components/ui/spinner-loader";
 
-interface EditTwitterCategorySheetProps {
+interface EditPoliceCategorySheetProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   twitterSettings: TwitterScrapperConfig;
@@ -32,26 +32,19 @@ interface EditTwitterCategorySheetProps {
 }
 
 const formSchema = z.object({
-  category_name: z.string(),
-  page_title: z.string(),
-  page_title_horizontal: z.string(),
-  keywords: z.array(z.object({
-    id: z.string(),
-    text: z.string()
-  })),
-  negative_keywords: z.array(z.object({
+  police_municipalities: z.array(z.object({
     id: z.string(),
     text: z.string()
   }))
 });
 
-const EditTwitterCategorySheet = ({
+const EditPoliceCategorySheet = ({
                                     open,
                                     setOpen,
                                     twitterSettings,
                                     currentCategoryName,
                                     updateTwitterSettings
-                                  }: EditTwitterCategorySheetProps) => {
+                                  }: EditPoliceCategorySheetProps) => {
   const currentCategory = twitterSettings.categories.find(c => c.category_name === currentCategoryName);
 
   const { toast } = useToast();
@@ -61,45 +54,29 @@ const EditTwitterCategorySheet = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      category_name: "",
-      page_title: "",
-      page_title_horizontal: "",
-      keywords: [],
-      negative_keywords: []
+      police_municipalities: []
     }
   });
 
   useEffect(() => {
-    const currentKeywords = currentCategory?.keywords.map((k) => ({
+    const currentMunicipalities = currentCategory?.police_municipalities.map((k) => ({
       id: uuid(),
       text: k
     }));
 
-    const currentNegativeKeywords = currentCategory?.negative_keywords.map((k) => ({
-      id: uuid(),
-      text: k
-    }));
-
-    form.setValue("category_name", currentCategoryName);
-    form.setValue("page_title", currentCategory?.page_title!);
-    form.setValue("page_title_horizontal", currentCategory?.page_title_horizontal!);
-    form.setValue("keywords", currentKeywords!);
-    form.setValue("negative_keywords", currentNegativeKeywords!);
+    form.setValue("police_municipalities", currentMunicipalities!);
 
   }, [currentCategory]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
-
     const filteredResult = {
-      ...values,
-      keywords: values.keywords.map(k => k.text),
-      negative_keywords: values.negative_keywords.map(k => k.text)
+      police_municipalities: values.police_municipalities.map(k => k.text)
     };
 
     const updatedCategories = twitterSettings.categories.map(obj => {
       if (obj.category_name === currentCategoryName) {
-        return { ...obj, ...filteredResult };
+        return { ...obj ,...filteredResult };
       }
       return obj;
     });
@@ -108,6 +85,7 @@ const EditTwitterCategorySheet = ({
       ...twitterSettings,
       categories: updatedCategories
     };
+
 
 
     try {
@@ -137,72 +115,19 @@ const EditTwitterCategorySheet = ({
       <SheetContent className="min-w-full lg:min-w-[600px] text-start">
         <ScrollArea className="h-full px-4 mt-2">
           <SheetHeader>
-            <SheetTitle>Edit Rss Category ({currentCategoryName})</SheetTitle>
+            <SheetTitle>Edit Police News Scrapper ({currentCategoryName})</SheetTitle>
+
           </SheetHeader>
           <div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 mt-8">
                 <FormField
                   control={form.control}
-                  name="category_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category Name</FormLabel>
-                      <FormControl>
-                        <Input  {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="page_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Page Title (Vertical)</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="page_title_horizontal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Page Title (Horizontal)</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="keywords"
+                  name="police_municipalities"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Keywords inputTitle={"Keywords"} inputName={"keywords"} inputPlaceholder={""}
-                                  tags={field.value}
-                                  setTags={field.onChange} {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="negative_keywords"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Keywords inputTitle={"Negative Keywords"} inputName={"negative_keywords"} inputPlaceholder={""}
+                        <Keywords inputTitle={"Police Municipalities"} inputName={"police_municipalities"} inputPlaceholder={""}
                                   tags={field.value}
                                   setTags={field.onChange} {...field}
                         />
@@ -230,4 +155,4 @@ const EditTwitterCategorySheet = ({
   );
 };
 
-export default EditTwitterCategorySheet;
+export default EditPoliceCategorySheet;

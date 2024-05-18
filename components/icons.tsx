@@ -21,14 +21,14 @@ import {
   MoreVertical,
   Pizza,
   Plus,
-  Settings,
+  Settings, ShieldHalf,
   SunMedium,
   Trash,
   Twitter,
   User,
   User2Icon,
   UserX2Icon,
-  X,
+  X
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -60,6 +60,7 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
+  police: ShieldHalf,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

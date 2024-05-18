@@ -11,6 +11,7 @@ export interface Category {
   page_title_horizontal: string;
   keywords:              string[];
   negative_keywords:     string[];
+  police_municipalities: string[];
 }
 
 export interface TwitterAccount {
