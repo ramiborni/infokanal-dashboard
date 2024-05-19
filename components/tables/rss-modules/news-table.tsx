@@ -31,7 +31,7 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon
 } from "@radix-ui/react-icons";
-import { ChevronLeftIcon, ChevronRightIcon, EraserIcon, SearchIcon, XIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, EraserIcon, LinkIcon, SearchIcon, XIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import axios from "axios";
@@ -150,6 +150,17 @@ export function NewsTable<TData, TValue>({
           aria-label="Select row"
         />
       ),
+    },
+    {
+      accessorKey: "feed_item_url",
+      header: "News URL",
+      cell: ({row, table}) => (
+       <a href={row.original.feed_item_url}>
+         <Button size="icon" variant="ghost">
+           <LinkIcon className="text-primary"/>
+         </Button>
+       </a>
+      )
     }
   ];
 
