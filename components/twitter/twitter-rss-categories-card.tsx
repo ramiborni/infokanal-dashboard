@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PenIcon, XIcon } from "lucide-react";
+import { LinkIcon, PenIcon, XIcon } from "lucide-react";
 import AddTwitterCategorySheet from "@/components/twitter/sheets/add-twitter-category-sheet";
 import DeleteTwitterRssCategoryDialog from "@/components/twitter/dialogs/delete-twitter-rss-category-dialog";
 import EditTwitterCategorySheet from "@/components/twitter/sheets/edit-twitter-category-sheet";
+import LinksTwitterRssCategoryDialog from "@/components/twitter/dialogs/links-twitter-rss-category-dialog";
 
 interface TwitterRssCategoriesCardProps{
   twitterConfig: TwitterScrapperConfig;
@@ -16,10 +17,16 @@ const TwitterRssCategoriesCard = ({twitterConfig,setTwitterConfig}: TwitterRssCa
   const [openAddCategoryDialog,setOpenAddCategoryDialog] = useState(false);
   const [openEditCategoryDialog,setOpenEditCategoryDialog] = useState(false);
   const [openDeleteCategoryDialog,setOpenDeleteCategoryDialog] = useState(false);
+  const [openLinkCategoryDialog, setOpenLinkCategoryDialog] = useState(false);
 
 
   const [selectedRssCategory, setSelectedRssCategory] = useState<string>("");
 
+
+  const openLinksCategory = (categoryName: string) => {
+    setSelectedRssCategory(categoryName);
+    setOpenLinkCategoryDialog(true)
+  }
   const openAddCategory = () => {
     setOpenAddCategoryDialog(true);
   }
@@ -63,6 +70,7 @@ const TwitterRssCategoriesCard = ({twitterConfig,setTwitterConfig}: TwitterRssCa
                     <TableCell>{t.keywords.length}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex flex-row gap-x-1">
+                        <Button variant="ghost" size="icon" onClick={() => openLinksCategory(t.category_name)}><LinkIcon className="h-4 w-4"/></Button>
                         <Button variant="ghost" size="icon" onClick={() => openEditCategory(t.category_name)}><PenIcon className="h-4 w-4"/></Button>
                         <Button variant="ghost" size="icon" onClick={() => openDeleteCategory(t.category_name)}><XIcon className="h-4 w-4"/></Button>
                       </div>
@@ -75,6 +83,8 @@ const TwitterRssCategoriesCard = ({twitterConfig,setTwitterConfig}: TwitterRssCa
           </Table>
         </CardContent>
       </Card>
+      <LinksTwitterRssCategoryDialog open={openLinkCategoryDialog} setOpen={setOpenLinkCategoryDialog} twitterSettings={twitterConfig} updateTwitterSettings={setTwitterConfig} categoryName={selectedRssCategory}/>
+
       <AddTwitterCategorySheet open={openAddCategoryDialog} setOpen={setOpenAddCategoryDialog} twitterSettings={twitterConfig} updateTwitterSettings={setTwitterConfig}/>
       <EditTwitterCategorySheet open={openEditCategoryDialog} setOpen={setOpenEditCategoryDialog} twitterSettings={twitterConfig} updateTwitterSettings={setTwitterConfig} currentCategoryName={selectedRssCategory}/>
       <DeleteTwitterRssCategoryDialog open={openDeleteCategoryDialog} setOpen={setOpenDeleteCategoryDialog} categoryName={selectedRssCategory} twitterSettings={twitterConfig} updateTwitterSettings={setTwitterConfig}/>

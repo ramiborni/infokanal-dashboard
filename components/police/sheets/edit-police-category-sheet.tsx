@@ -22,6 +22,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { v4 as uuid } from "uuid";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SpinnerLoader from "@/components/ui/spinner-loader";
+import MultipleSelector, { Option } from "@/components/ui/multi-selector";
+import { PoliceMunicipalities } from "@/constants/police-municipalities";
 
 interface EditPoliceCategorySheetProps {
   open: boolean;
@@ -32,19 +34,34 @@ interface EditPoliceCategorySheetProps {
 }
 
 const formSchema = z.object({
-  police_municipalities: z.array(z.object({
-    id: z.string(),
-    text: z.string()
-  }))
+  police_municipalities: z.array(z.object(
+    {
+      value: z.string(),
+      label: z.string(),
+      group: z.string(),
+    }
+  ))
 });
 
+
+const OPTIONS: Option[] = [];
+
+PoliceMunicipalities.forEach(municipality => {
+  municipality.cities.forEach(city => {
+    OPTIONS.push({ label: city, value: city, group: municipality.county });
+  });
+});
+
+
 const EditPoliceCategorySheet = ({
-                                    open,
-                                    setOpen,
-                                    twitterSettings,
-                                    currentCategoryName,
-                                    updateTwitterSettings
-                                  }: EditPoliceCategorySheetProps) => {
+                                   open,
+                                   setOpen,
+                                   twitterSettings,
+                                   currentCategoryName,
+                                   updateTwitterSettings
+                                 }: EditPoliceCategorySheetProps) => {
+  const [selected, setSelected] = useState<string[]>([]);
+
   const currentCategory = twitterSettings.categories.find(c => c.category_name === currentCategoryName);
 
   const { toast } = useToast();
@@ -59,24 +76,27 @@ const EditPoliceCategorySheet = ({
   });
 
   useEffect(() => {
-    const currentMunicipalities = currentCategory?.police_municipalities.map((k) => ({
-      id: uuid(),
-      text: k
-    }));
 
-    form.setValue("police_municipalities", currentMunicipalities!);
+    // @ts-ignore
+    return form.setValue("police_municipalities", currentCategory?.police_municipalities?.map(
+      (p) => ({
+        "label": p,
+        "value": p,
+        "group": OPTIONS.find(o => o.value === p)?.group
+      })
+    ));
 
   }, [currentCategory]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
     const filteredResult = {
-      police_municipalities: values.police_municipalities.map(k => k.text)
+      police_municipalities: values.police_municipalities.map((p) => p.value),
     };
 
     const updatedCategories = twitterSettings.categories.map(obj => {
       if (obj.category_name === currentCategoryName) {
-        return { ...obj ,...filteredResult };
+        return { ...obj, ...filteredResult };
       }
       return obj;
     });
@@ -85,7 +105,6 @@ const EditPoliceCategorySheet = ({
       ...twitterSettings,
       categories: updatedCategories
     };
-
 
 
     try {
@@ -120,29 +139,33 @@ const EditPoliceCategorySheet = ({
           </SheetHeader>
           <div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 mt-8">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
                 <FormField
                   control={form.control}
                   name="police_municipalities"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Municipalities</FormLabel>
                       <FormControl>
-                        <Keywords inputTitle={"Police Municipalities"} inputName={"police_municipalities"} inputPlaceholder={""}
-                                  tags={field.value}
-                                  setTags={field.onChange} {...field}
+                        <MultipleSelector
+                          {...field}
+                          defaultOptions={OPTIONS}
+                          placeholder="Select municipalities you want for setting the scrapper.."
+                          emptyIndicator={
+                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                              no results found.
+                            </p>
+                          }
+                          groupBy="group"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <SheetFooter className="pt-6">
-                  <Button type="submit">
-                    {
-                      isLoading ? <SpinnerLoader /> : <>Save changes</>
-                    }
-                  </Button>
-                </SheetFooter>
+                <Button disabled={isLoading} type="submit">
+                  Submit
+                </Button>
               </form>
             </Form>
 
