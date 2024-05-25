@@ -264,13 +264,20 @@ export function NewsTable<TData, TValue>({
             <div className="flex flex-row">
               <SelectLabel className="flex-1">Rss Sources</SelectLabel>
             </div>
-            {
-              sources.map(
-                (source) => <SelectItem key={source.source_name} value={source.source_name}>
-                  {source.source_name}
-                </SelectItem>
-              )
-            }
+
+              {
+                <></>
+                /*
+                sources.map(
+                  (source) => <SelectItem key={source.source_name} value={source.source_name}>
+                    {source.source_name}
+                  </SelectItem>
+                )
+                  */
+              }
+
+
+
           </SelectGroup>
         </SelectContent>
       </Select>

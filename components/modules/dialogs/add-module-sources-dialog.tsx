@@ -66,13 +66,15 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
       setIsLoading(true);
 
       const data = {
-        "sources": sources.map((s) => ({
-          "source_name": s.rssName,
-          "source_url": s.rssLink,
-          "require_login": s.isMembership,
-          "summarize_from_rss_feed": s.scrapeWebsite,
-          "require_keywords_verification": s.require_keywords_verification
-        }))
+        "sources": sources
+          .filter(s => s.rssName && s.rssLink && s.rssName!=="" && s.rssLink!=="") // Filter out objects with empty source_name or source_url
+          .map(s => ({
+            "source_name": s.rssName,
+            "source_url": s.rssLink,
+            "require_login": s.isMembership,
+            "summarize_from_rss_feed": s.scrapeWebsite,
+            "require_keywords_verification": s.require_keywords_verification
+          }))
       };
 
       const res = await axios.post(`${API_URL}/feed/modules/${moduleName}/sources/`, data);
@@ -169,11 +171,11 @@ const AddModuleSourcesDialog = ({ open, setOpen, moduleName, retrieveModules }: 
                 {
                   sources.map((s, index) => (<TableRow key={index}>
                       <TableCell className="font-semibold">
-                        <Input onChange={(e) => updateSources(e, index)} value={s.rssName} name="rssName" />
+                        <Input required onChange={(e) => updateSources(e, index)} value={s.rssName} name="rssName" />
                       </TableCell>
 
                       <TableCell className="font-semibold">
-                        <Input onChange={(e) => updateSources(e, index)} value={s.rssLink} name="rssLink" />
+                        <Input required onChange={(e) => updateSources(e, index)} value={s.rssLink} name="rssLink" />
                       </TableCell>
 
                       <TableCell>

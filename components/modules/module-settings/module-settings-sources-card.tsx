@@ -73,13 +73,15 @@ const ModuleSettingsSourcesCard = ({ slang, sources, setSources }: ModuleSetting
       setIsLoading(true);
 
       const data = {
-        "sources": sources.map((s) => ({
-          "source_name": s.source_name,
-          "source_url": s.source_url,
-          "require_login": s.require_login,
-          "summarize_from_rss_feed": s.summarize_from_rss_feed,
-          "require_keywords_verification": s.require_keywords_verification
-        }))
+        "sources": sources
+          .filter(s => s.source_name && s.source_url) // Filter out objects with empty source_name or source_url
+          .map(s => ({
+            "source_name": s.source_name,
+            "source_url": s.source_url,
+            "require_login": s.require_login,
+            "summarize_from_rss_feed": s.summarize_from_rss_feed,
+            "require_keywords_verification": s.require_keywords_verification
+          }))
       };
 
       const res = await axios.post(`${API_URL}/feed/modules/${slang}/sources/`, data);
